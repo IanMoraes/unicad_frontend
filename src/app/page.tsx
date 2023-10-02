@@ -1,95 +1,88 @@
-import Image from 'next/image'
-import styles from './page.module.css'
-
+"use client";
+import { Box, Button, CircularProgress, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { useEffect, useState } from "react";
+import DeliveryService from "./services/DeliveryService";
+import Delivery from "./models/Delivery";
+import Table from "./components/Table";
+import Form, { FormData } from "@/app/components/Form"
+import dayjs from "dayjs";
 export default function Home() {
+  const initialFormData: FormData = {
+    client: "",
+    origin: "",
+    destination: "",
+    date: null,
+  };
+
+  const [deliveries, setDeliveries] = useState<Delivery[]>([]);
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState<FormData>(initialFormData);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+  const convertFormDataToDelivery = (formData: FormData): Delivery => {
+    const { client, origin, destination, date } = formData;
+    return {
+      client,
+      origin,
+      destination,
+      date: date ? dayjs(date).format('DD/M/YYYY'): "",
+    };
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const deliveryData: Delivery = convertFormDataToDelivery(formData);
+    DeliveryService.createDeliveries(deliveryData);
+    DeliveryService.getDeliveries().then((data) => {
+      setDeliveries(data);
+    });
+    handleClose()
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  useEffect(() => {
+    DeliveryService.getDeliveries().then((data) => {
+      setDeliveries(data);
+    });
+  }, []);
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
+    <main>
+      <Container>
+        <Box
+          display={"flex"}
+          justifyContent={"center"}
+          alignItems={"center"}
+          height={"100vh"}
+          flexDirection={"column"}
+          gap={4}
         >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+          <Box justifyContent={"right"} alignItems={"right"}>
+            <Button variant="outlined" onClick={handleClickOpen}>
+              Cadastrar Entrega
+            </Button>
+          </Box>
+          <Box>
+            {deliveries.length > 0 ? (
+              <Table rows={deliveries} />
+            ) : (
+              <CircularProgress />
+            )}
+          </Box>
+        </Box>
+      </Container>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle >Cadastrar Entrega</DialogTitle>
+        <DialogContent>
+          <Form formData={formData} setFormData={setFormData} handleSubmit={handleSubmit}/>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancelar</Button>
+        </DialogActions>
+      </Dialog>
     </main>
-  )
+  );
 }
