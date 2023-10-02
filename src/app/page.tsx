@@ -40,6 +40,7 @@ export default function Home() {
       setDeliveries(data);
     });
     handleClose()
+    setFormData(initialFormData)
   };
   const handleClose = () => {
     setOpen(false);
