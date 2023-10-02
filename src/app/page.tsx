@@ -36,11 +36,12 @@ export default function Home() {
     e.preventDefault();
     const deliveryData: Delivery = convertFormDataToDelivery(formData);
     DeliveryService.createDeliveries(deliveryData);
-    DeliveryService.getDeliveries().then((data) => {
+    setTimeout(()=>{ DeliveryService.getDeliveries().then((data) => {
       setDeliveries(data);
-    });
-    handleClose()
-    setFormData(initialFormData)
+      handleClose()
+      setFormData(initialFormData)
+    })}, 1000)
+   
   };
   const handleClose = () => {
     setOpen(false);
