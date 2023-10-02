@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import DeliveryService from "./services/DeliveryService";
 import Delivery from "./models/Delivery";
 import Table from "./components/Table";
-import Form, { FormData } from "@/app/components/Form"
+import Form, { FormData } from "./components/Form"
 import dayjs from "dayjs";
+import React from "react";
 export default function Home() {
   const initialFormData: FormData = {
     client: "",

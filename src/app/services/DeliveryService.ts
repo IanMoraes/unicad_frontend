@@ -1,4 +1,4 @@
-import api from "@/app/dependencies/api";
+import api from "../dependencies/api";
 import Delivery from '@/app/models/Delivery'
 
 class DeliveryService {
